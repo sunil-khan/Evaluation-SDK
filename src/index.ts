@@ -12,3 +12,5 @@ export type {
   SuiteConfig,
   TestCase,
 } from "./types.js";
+
+export { EvalError, ConfigError, AdapterError, JudgeParseError, ScorerError } from './errors.js';
