@@ -1,5 +1,5 @@
-import { ConfigError, ScorerError } from '../errors.js';
-import type { Scorer, ScoreResult, TestCase } from '../types.js';
+import { ConfigError, ScorerError } from "../errors.js";
+import type { ScoreResult, Scorer, TestCase } from "../types.js";
 
 interface CompositeOptions {
   /** The inner scorers to combine. */
@@ -26,27 +26,26 @@ export function composite(options: CompositeOptions): Scorer {
 
   if (scorers.length !== weights.length) {
     throw new ConfigError(
-      `composite: scorers length (${scorers.length}) must match weights length (${weights.length}).`
+      `composite: scorers length (${scorers.length}) must match weights length (${weights.length}).`,
     );
   }
 
   const weightSum = weights.reduce((sum, w) => sum + w, 0);
   if (Math.abs(weightSum - 1.0) > WEIGHT_TOLERANCE) {
-    throw new ConfigError(
-      `composite: weights must sum to 1.0, but got ${weightSum.toFixed(4)}.`
-    );
+    throw new ConfigError(`composite: weights must sum to 1.0, but got ${weightSum.toFixed(4)}.`);
   }
 
   return {
-    name: 'composite',
+    name: "composite",
+    // biome-ignore lint/complexity/noExcessiveCognitiveComplexity: scorer logic requires branching for error/weight redistribution
     async score(testCase: TestCase): Promise<ScoreResult> {
       const start = performance.now();
 
       // Run all inner scorers, catching errors
       const results: Array<{ result: ScoreResult; weight: number }> = [];
       for (let i = 0; i < scorers.length; i++) {
-        const scorer = scorers[i]!;
-        const weight = weights[i]!;
+        const scorer = scorers[i] as Scorer;
+        const weight = weights[i] as number;
 
         try {
           const result = await scorer.score(testCase);
@@ -77,12 +76,12 @@ export function composite(options: CompositeOptions): Scorer {
       // All errored — return combined error
       if (successful.length === 0) {
         return {
-          scorer: 'composite',
+          scorer: "composite",
           score: 0,
           passed: false,
           reason: `All ${errored.length} inner scorers errored.`,
-          error: new ScorerError('All inner scorers in composite failed', {
-            scorerName: 'composite',
+          error: new ScorerError("All inner scorers in composite failed", {
+            scorerName: "composite",
             caseId: testCase.id,
           }),
           raw: results.map((r) => r.result),
@@ -108,10 +107,10 @@ export function composite(options: CompositeOptions): Scorer {
       const passed = weightedScore >= threshold;
 
       return {
-        scorer: 'composite',
+        scorer: "composite",
         score: weightedScore,
         passed,
-        reason: breakdown.join(' | '),
+        reason: breakdown.join(" | "),
         raw: results.map((r) => r.result),
         latencyMs: performance.now() - start,
       };

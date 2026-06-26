@@ -1,58 +1,58 @@
-import { describe, expect, it } from 'vitest';
-import { ConfigError } from '../src/errors.js';
-import { defineSuite } from '../src/suite.js';
-import type { Scorer, TestCase } from '../src/types.js';
+import { describe, expect, it } from "vitest";
+import { ConfigError } from "../src/errors.js";
+import { defineSuite } from "../src/suite.js";
+import type { Scorer, TestCase } from "../src/types.js";
 
 const passingScorer: Scorer = {
-  name: 'always-pass',
-  async score(tc) {
-    return { scorer: 'always-pass', score: 1, passed: true, reason: 'pass', latencyMs: 1 };
+  name: "always-pass",
+  async score(_tc) {
+    return { scorer: "always-pass", score: 1, passed: true, reason: "pass", latencyMs: 1 };
   },
 };
 
 const failingScorer: Scorer = {
-  name: 'always-fail',
-  async score(tc) {
-    return { scorer: 'always-fail', score: 0, passed: false, reason: 'fail', latencyMs: 1 };
+  name: "always-fail",
+  async score(_tc) {
+    return { scorer: "always-fail", score: 0, passed: false, reason: "fail", latencyMs: 1 };
   },
 };
 
 const makeCase = (id: string): TestCase => ({
   id,
-  input: 'q',
-  output: 'a',
-  expected: 'a',
+  input: "q",
+  output: "a",
+  expected: "a",
 });
 
-describe('defineSuite', () => {
-  it('throws ConfigError for empty suite name', () => {
+describe("defineSuite", () => {
+  it("throws ConfigError for empty suite name", () => {
     expect(() =>
-      defineSuite({ name: '', cases: [makeCase('c1')], scorers: [passingScorer] })
+      defineSuite({ name: "", cases: [makeCase("c1")], scorers: [passingScorer] }),
     ).toThrow(ConfigError);
   });
 
-  it('throws ConfigError for empty cases', () => {
-    expect(() =>
-      defineSuite({ name: 'test', cases: [], scorers: [passingScorer] })
-    ).toThrow(ConfigError);
+  it("throws ConfigError for empty cases", () => {
+    expect(() => defineSuite({ name: "test", cases: [], scorers: [passingScorer] })).toThrow(
+      ConfigError,
+    );
   });
 
-  it('throws ConfigError for empty scorers', () => {
-    expect(() =>
-      defineSuite({ name: 'test', cases: [makeCase('c1')], scorers: [] })
-    ).toThrow(ConfigError);
+  it("throws ConfigError for empty scorers", () => {
+    expect(() => defineSuite({ name: "test", cases: [makeCase("c1")], scorers: [] })).toThrow(
+      ConfigError,
+    );
   });
 
-  it('creates a valid suite and runs it', async () => {
+  it("creates a valid suite and runs it", async () => {
     const suite = defineSuite({
-      name: 'test-suite',
-      cases: [makeCase('c1'), makeCase('c2')],
+      name: "test-suite",
+      cases: [makeCase("c1"), makeCase("c2")],
       scorers: [passingScorer],
     });
 
     const report = await suite.run();
 
-    expect(report.suite).toBe('test-suite');
+    expect(report.suite).toBe("test-suite");
     expect(report.cases).toHaveLength(2);
     expect(report.summary.total).toBe(2);
     expect(report.summary.passed).toBe(2);
@@ -62,25 +62,25 @@ describe('defineSuite', () => {
     expect(report.finishedAt).toMatch(/^\d{4}-\d{2}-\d{2}T/);
   });
 
-  it('computes byScorer statistics', async () => {
+  it("computes byScorer statistics", async () => {
     const suite = defineSuite({
-      name: 'stats-suite',
-      cases: [makeCase('c1'), makeCase('c2')],
+      name: "stats-suite",
+      cases: [makeCase("c1"), makeCase("c2")],
       scorers: [passingScorer, failingScorer],
     });
 
     const report = await suite.run();
 
-    expect(report.summary.byScorer['always-pass']?.passRate).toBe(1);
-    expect(report.summary.byScorer['always-pass']?.avgScore).toBe(1);
-    expect(report.summary.byScorer['always-fail']?.passRate).toBe(0);
-    expect(report.summary.byScorer['always-fail']?.avgScore).toBe(0);
+    expect(report.summary.byScorer["always-pass"]?.passRate).toBe(1);
+    expect(report.summary.byScorer["always-pass"]?.avgScore).toBe(1);
+    expect(report.summary.byScorer["always-fail"]?.passRate).toBe(0);
+    expect(report.summary.byScorer["always-fail"]?.avgScore).toBe(0);
   });
 
   it('uses passPolicy "all" by default', async () => {
     const suite = defineSuite({
-      name: 'policy-test',
-      cases: [makeCase('c1')],
+      name: "policy-test",
+      cases: [makeCase("c1")],
       scorers: [passingScorer, failingScorer],
     });
 
@@ -91,10 +91,10 @@ describe('defineSuite', () => {
 
   it('supports passPolicy "any"', async () => {
     const suite = defineSuite({
-      name: 'policy-any',
-      cases: [makeCase('c1')],
+      name: "policy-any",
+      cases: [makeCase("c1")],
       scorers: [passingScorer, failingScorer],
-      passPolicy: 'any',
+      passPolicy: "any",
     });
 
     const report = await suite.run();
@@ -102,17 +102,17 @@ describe('defineSuite', () => {
     expect(report.summary.passed).toBe(1);
   });
 
-  it('counts errored cases correctly', async () => {
+  it("counts errored cases correctly", async () => {
     const errorScorer: Scorer = {
-      name: 'error-scorer',
+      name: "error-scorer",
       async score() {
-        throw new Error('boom');
+        throw new Error("boom");
       },
     };
 
     const suite = defineSuite({
-      name: 'error-suite',
-      cases: [makeCase('c1'), makeCase('c2')],
+      name: "error-suite",
+      cases: [makeCase("c1"), makeCase("c2")],
       scorers: [passingScorer, errorScorer],
     });
 
@@ -121,10 +121,10 @@ describe('defineSuite', () => {
     expect(report.summary.passed).toBe(0); // passPolicy 'all' — error means not passed
   });
 
-  it('defaults concurrency to 4', async () => {
+  it("defaults concurrency to 4", async () => {
     const suite = defineSuite({
-      name: 'concurrency-test',
-      cases: [makeCase('c1')],
+      name: "concurrency-test",
+      cases: [makeCase("c1")],
       scorers: [passingScorer],
     });
 

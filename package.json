@@ -18,7 +18,9 @@
       }
     }
   },
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "build": "tsup",
     "typecheck": "tsc --noEmit",
@@ -31,7 +33,14 @@
     "docs": "typedoc --entryPoints src/index.ts --out docs/api",
     "ci": "pnpm lint && pnpm typecheck && pnpm test"
   },
-  "keywords": ["llm", "evaluation", "testing", "ai", "scoring", "typescript"],
+  "keywords": [
+    "llm",
+    "evaluation",
+    "testing",
+    "ai",
+    "scoring",
+    "typescript"
+  ],
   "author": "Sunil Khan <khan.sunil119@gmail.com>",
   "license": "MIT",
   "repository": {
@@ -44,6 +53,7 @@
   "packageManager": "pnpm@10.17.1",
   "devDependencies": {
     "@biomejs/biome": "^2.5.1",
+    "@types/node": "^26.0.1",
     "tsup": "^8.5.1",
     "typedoc": "^0.28.19",
     "typescript": "^6.0.3",

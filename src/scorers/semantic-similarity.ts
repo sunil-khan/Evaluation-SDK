@@ -1,5 +1,5 @@
-import { AdapterError, ScorerError } from '../errors.js';
-import type { EmbeddingAdapter, Scorer, ScoreResult, TestCase } from '../types.js';
+import { AdapterError, ScorerError } from "../errors.js";
+import type { EmbeddingAdapter, ScoreResult, Scorer, TestCase } from "../types.js";
 
 interface SemanticSimilarityOptions {
   /** The embedding adapter to use. */
@@ -38,19 +38,20 @@ export function semanticSimilarity(options: SemanticSimilarityOptions): Scorer {
   const cache = new Map<string, ReadonlyArray<number>>();
 
   return {
-    name: 'semanticSimilarity',
+    name: "semanticSimilarity",
+    // biome-ignore lint/complexity/noExcessiveCognitiveComplexity: vector scoring requires multiple validation branches
     async score(testCase: TestCase): Promise<ScoreResult> {
       const start = performance.now();
 
       if (testCase.expected === undefined || testCase.expected === null) {
         return {
-          scorer: 'semanticSimilarity',
+          scorer: "semanticSimilarity",
           score: 0,
           passed: false,
-          reason: 'semanticSimilarity requires `expected` to be set on the test case.',
+          reason: "semanticSimilarity requires `expected` to be set on the test case.",
           error: new ScorerError(
-            'semanticSimilarity requires `expected` to be set on the test case.',
-            { scorerName: 'semanticSimilarity', caseId: testCase.id }
+            "semanticSimilarity requires `expected` to be set on the test case.",
+            { scorerName: "semanticSimilarity", caseId: testCase.id },
           ),
           latencyMs: performance.now() - start,
         };
@@ -67,7 +68,7 @@ export function semanticSimilarity(options: SemanticSimilarityOptions): Scorer {
         if (textsToEmbed.length > 0) {
           const vectors = await options.embed.embed(textsToEmbed);
           for (let i = 0; i < textsToEmbed.length; i++) {
-            const text = textsToEmbed[i]!;
+            const text = textsToEmbed[i] as string;
             const vector = vectors[i];
             if (vector) {
               cache.set(text, vector);
@@ -80,12 +81,12 @@ export function semanticSimilarity(options: SemanticSimilarityOptions): Scorer {
 
         if (!outputVec || !expectedVec) {
           return {
-            scorer: 'semanticSimilarity',
+            scorer: "semanticSimilarity",
             score: 0,
             passed: false,
-            reason: 'Failed to retrieve embedding vectors.',
-            error: new AdapterError('Embedding adapter returned no vectors', {
-              adapterType: 'embedding',
+            reason: "Failed to retrieve embedding vectors.",
+            error: new AdapterError("Embedding adapter returned no vectors", {
+              adapterType: "embedding",
             }),
             latencyMs: performance.now() - start,
           };
@@ -94,13 +95,13 @@ export function semanticSimilarity(options: SemanticSimilarityOptions): Scorer {
         // Validate dimensions
         if (outputVec.length !== expectedVec.length) {
           return {
-            scorer: 'semanticSimilarity',
+            scorer: "semanticSimilarity",
             score: 0,
             passed: false,
             reason: `Vector dimension mismatch: output has ${outputVec.length} dims, expected has ${expectedVec.length} dims.`,
             error: new AdapterError(
               `Vector dimension mismatch: ${outputVec.length} vs ${expectedVec.length}`,
-              { adapterType: 'embedding' }
+              { adapterType: "embedding" },
             ),
             latencyMs: performance.now() - start,
           };
@@ -112,10 +113,10 @@ export function semanticSimilarity(options: SemanticSimilarityOptions): Scorer {
 
         if (outputMag === 0 || expectedMag === 0) {
           return {
-            scorer: 'semanticSimilarity',
+            scorer: "semanticSimilarity",
             score: 0,
             passed: false,
-            reason: 'Cannot compute cosine similarity: zero-magnitude vector detected.',
+            reason: "Cannot compute cosine similarity: zero-magnitude vector detected.",
             latencyMs: performance.now() - start,
           };
         }
@@ -125,7 +126,7 @@ export function semanticSimilarity(options: SemanticSimilarityOptions): Scorer {
         const passed = clampedScore >= threshold;
 
         return {
-          scorer: 'semanticSimilarity',
+          scorer: "semanticSimilarity",
           score: clampedScore,
           passed,
           reason: `Cosine similarity: ${clampedScore.toFixed(4)} (threshold: ${threshold}).`,
@@ -133,16 +134,15 @@ export function semanticSimilarity(options: SemanticSimilarityOptions): Scorer {
         };
       } catch (err) {
         return {
-          scorer: 'semanticSimilarity',
+          scorer: "semanticSimilarity",
           score: 0,
           passed: false,
           reason: `Embedding failed: ${err instanceof Error ? err.message : String(err)}`,
           error: new AdapterError(
             `Embedding adapter failed: ${err instanceof Error ? err.message : String(err)}`,
-            {
-              adapterType: 'embedding',
-              cause: err instanceof Error ? err : undefined,
-            }
+            err instanceof Error
+              ? { adapterType: "embedding" as const, cause: err }
+              : { adapterType: "embedding" as const },
           ),
           latencyMs: performance.now() - start,
         };

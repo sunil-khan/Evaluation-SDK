@@ -1,5 +1,5 @@
-import { ScorerError } from '../errors.js';
-import type { Scorer, ScoreResult, TestCase } from '../types.js';
+import { ScorerError } from "../errors.js";
+import type { ScoreResult, Scorer, TestCase } from "../types.js";
 
 interface ExactMatchOptions {
   /** Trim, collapse whitespace, and lowercase before comparing. Default: true. */
@@ -12,11 +12,11 @@ function normalizeText(text: string, options: ExactMatchOptions): string {
   let result = text;
 
   if (options.normalize !== false) {
-    result = result.trim().toLowerCase().replace(/\s+/g, ' ');
+    result = result.trim().toLowerCase().replace(/\s+/g, " ");
   }
 
   if (options.ignorePunctuation === true) {
-    result = result.replace(/[^\w\s]/g, '');
+    result = result.replace(/[^\w\s]/g, "");
   }
 
   return result;
@@ -32,7 +32,7 @@ function findFirstDivergence(a: string, b: string): string {
   if (a.length !== b.length) {
     return `Strings differ in length: output has ${a.length} chars, expected has ${b.length} chars`;
   }
-  return 'Strings are identical';
+  return "Strings are identical";
 }
 
 /**
@@ -44,21 +44,21 @@ function findFirstDivergence(a: string, b: string): string {
  */
 export function exactMatch(options: ExactMatchOptions = {}): Scorer {
   return {
-    name: 'exactMatch',
+    name: "exactMatch",
     async score(testCase: TestCase): Promise<ScoreResult> {
       const start = performance.now();
 
       if (testCase.expected === undefined || testCase.expected === null) {
         const latencyMs = performance.now() - start;
         return {
-          scorer: 'exactMatch',
+          scorer: "exactMatch",
           score: 0,
           passed: false,
-          reason: 'exactMatch requires `expected` to be set on the test case.',
-          error: new ScorerError(
-            'exactMatch requires `expected` to be set on the test case.',
-            { scorerName: 'exactMatch', caseId: testCase.id }
-          ),
+          reason: "exactMatch requires `expected` to be set on the test case.",
+          error: new ScorerError("exactMatch requires `expected` to be set on the test case.", {
+            scorerName: "exactMatch",
+            caseId: testCase.id,
+          }),
           latencyMs,
         };
       }
@@ -69,10 +69,10 @@ export function exactMatch(options: ExactMatchOptions = {}): Scorer {
       const latencyMs = performance.now() - start;
 
       return {
-        scorer: 'exactMatch',
+        scorer: "exactMatch",
         score: isMatch ? 1 : 0,
         passed: isMatch,
-        reason: isMatch ? 'Exact match.' : findFirstDivergence(output, expected),
+        reason: isMatch ? "Exact match." : findFirstDivergence(output, expected),
         latencyMs,
       };
     },

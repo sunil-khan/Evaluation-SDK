@@ -1,4 +1,13 @@
 // Public API — exports added as modules are implemented.
+
+export { AdapterError, ConfigError, EvalError, JudgeParseError, ScorerError } from "./errors.js";
+export { consoleReporter } from "./reporters/console.js";
+export { jsonReporter } from "./reporters/json.js";
+export { composite } from "./scorers/composite.js";
+export { exactMatch } from "./scorers/exact-match.js";
+export { llmJudge } from "./scorers/llm-judge.js";
+export { semanticSimilarity } from "./scorers/semantic-similarity.js";
+export { defineSuite } from "./suite.js";
 export type {
   CaseReport,
   ChatAdapter,
@@ -12,12 +21,3 @@ export type {
   SuiteConfig,
   TestCase,
 } from "./types.js";
-
-export { EvalError, ConfigError, AdapterError, JudgeParseError, ScorerError } from './errors.js';
-export { exactMatch } from './scorers/exact-match.js';
-export { llmJudge } from './scorers/llm-judge.js';
-export { semanticSimilarity } from './scorers/semantic-similarity.js';
-export { composite } from './scorers/composite.js';
-export { defineSuite } from './suite.js';
-export { consoleReporter } from './reporters/console.js';
-export { jsonReporter } from './reporters/json.js';

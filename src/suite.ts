@@ -1,7 +1,7 @@
-import { ConfigError } from './errors.js';
-import { runCases } from './runner.js';
-import type { CaseReport, Report, ReportSummary, ScoreResult, SuiteConfig } from './types.js';
-import { suiteConfigSchema } from './types.js';
+import { ConfigError } from "./errors.js";
+import { runCases } from "./runner.js";
+import type { CaseReport, Report, ReportSummary, ScoreResult, SuiteConfig } from "./types.js";
+import { suiteConfigSchema } from "./types.js";
 
 /**
  * A configured evaluation suite ready to be run.
@@ -30,9 +30,7 @@ function buildSummary(cases: ReadonlyArray<CaseReport>, scorerNames: string[]): 
     const scorerPassed = scorerResults.filter((r) => r.passed).length;
     const scorerTotal = scorerResults.length;
     const avgScore =
-      scorerTotal > 0
-        ? scorerResults.reduce((sum, r) => sum + r.score, 0) / scorerTotal
-        : 0;
+      scorerTotal > 0 ? scorerResults.reduce((sum, r) => sum + r.score, 0) / scorerTotal : 0;
 
     byScorer[name] = {
       passRate: scorerTotal > 0 ? scorerPassed / scorerTotal : 0,
@@ -47,9 +45,7 @@ function buildSummary(cases: ReadonlyArray<CaseReport>, scorerNames: string[]): 
     }
   }
   const avgLatencyMs =
-    allLatencies.length > 0
-      ? allLatencies.reduce((sum, l) => sum + l, 0) / allLatencies.length
-      : 0;
+    allLatencies.length > 0 ? allLatencies.reduce((sum, l) => sum + l, 0) / allLatencies.length : 0;
 
   return { total, passed, failed, errored, passRate, byScorer, avgLatencyMs };
 }
@@ -63,16 +59,16 @@ function buildSummary(cases: ReadonlyArray<CaseReport>, scorerNames: string[]): 
  * @throws ConfigError if the configuration is invalid.
  */
 export function defineSuite<TInput = unknown, TExpected = unknown>(
-  config: SuiteConfig<TInput, TExpected>
+  config: SuiteConfig<TInput, TExpected>,
 ): Suite {
   const parseResult = suiteConfigSchema.safeParse(config);
   if (!parseResult.success) {
-    const messages = parseResult.error.issues.map((i) => `  - ${i.path.join('.')}: ${i.message}`);
-    throw new ConfigError(`Suite validation failed:\n${messages.join('\n')}`);
+    const messages = parseResult.error.issues.map((i) => `  - ${i.path.join(".")}: ${i.message}`);
+    throw new ConfigError(`Suite validation failed:\n${messages.join("\n")}`);
   }
 
   const concurrency = config.concurrency ?? 4;
-  const passPolicy = config.passPolicy ?? 'all';
+  const passPolicy = config.passPolicy ?? "all";
 
   return {
     async run(): Promise<Report> {

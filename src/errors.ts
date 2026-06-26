@@ -1,10 +1,11 @@
 /**
  * Base class for all evalkit errors.
  */
+// biome-ignore lint/suspicious/noShadowRestrictedNames: intentional — public API requires this name
 export class EvalError extends Error {
   constructor(message: string, options?: ErrorOptions) {
     super(message, options);
-    this.name = 'EvalError';
+    this.name = "EvalError";
   }
 }
 
@@ -15,7 +16,7 @@ export class EvalError extends Error {
 export class ConfigError extends EvalError {
   constructor(message: string) {
     super(message);
-    this.name = 'ConfigError';
+    this.name = "ConfigError";
   }
 }
 
@@ -24,14 +25,11 @@ export class ConfigError extends EvalError {
  * Carries context about which adapter type failed and the underlying cause.
  */
 export class AdapterError extends EvalError {
-  readonly adapterType: 'chat' | 'embedding';
+  readonly adapterType: "chat" | "embedding";
 
-  constructor(
-    message: string,
-    context: { adapterType: 'chat' | 'embedding'; cause?: Error }
-  ) {
+  constructor(message: string, context: { adapterType: "chat" | "embedding"; cause?: Error }) {
     super(message, context.cause ? { cause: context.cause } : undefined);
-    this.name = 'AdapterError';
+    this.name = "AdapterError";
     this.adapterType = context.adapterType;
   }
 }
@@ -44,12 +42,9 @@ export class JudgeParseError extends EvalError {
   readonly rawResponse: string;
   readonly retriesAttempted: number;
 
-  constructor(
-    message: string,
-    context: { rawResponse: string; retriesAttempted: number }
-  ) {
+  constructor(message: string, context: { rawResponse: string; retriesAttempted: number }) {
     super(message);
-    this.name = 'JudgeParseError';
+    this.name = "JudgeParseError";
     this.rawResponse = context.rawResponse;
     this.retriesAttempted = context.retriesAttempted;
   }
@@ -63,12 +58,9 @@ export class ScorerError extends EvalError {
   readonly scorerName: string;
   readonly caseId: string;
 
-  constructor(
-    message: string,
-    context: { scorerName: string; caseId: string; cause?: Error }
-  ) {
+  constructor(message: string, context: { scorerName: string; caseId: string; cause?: Error }) {
     super(message, context.cause ? { cause: context.cause } : undefined);
-    this.name = 'ScorerError';
+    this.name = "ScorerError";
     this.scorerName = context.scorerName;
     this.caseId = context.caseId;
   }
