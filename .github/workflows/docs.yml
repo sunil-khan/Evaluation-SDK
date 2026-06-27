@@ -35,7 +35,7 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Generate API docs
-        run: pnpm docs
+        run: pnpm docs:generate
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
