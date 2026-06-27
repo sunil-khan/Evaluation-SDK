@@ -4,6 +4,7 @@ A small, opinionated, well-typed TypeScript library for evaluating LLM outputs.
 
 [![CI](https://github.com/sunil-khan/Evaluation-SDK/actions/workflows/ci.yml/badge.svg)](https://github.com/sunil-khan/Evaluation-SDK/actions/workflows/ci.yml)
 [![npm version](https://img.shields.io/npm/v/evalkit.svg)](https://npmjs.com/package/evalkit)
+[![API Docs](https://img.shields.io/badge/docs-typedoc-blue)](https://sunil-khan.github.io/Evaluation-SDK/)
 
 ---
 
