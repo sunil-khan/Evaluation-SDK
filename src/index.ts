@@ -8,6 +8,7 @@ export { exactMatch } from "./scorers/exact-match.js";
 export { llmJudge } from "./scorers/llm-judge.js";
 export { semanticSimilarity } from "./scorers/semantic-similarity.js";
 export { defineSuite } from "./suite.js";
+export type { Suite } from "./suite.js";
 export type {
   CaseReport,
   ChatAdapter,

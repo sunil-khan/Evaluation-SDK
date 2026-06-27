@@ -6,7 +6,7 @@ import { suiteConfigSchema } from "./types.js";
 /**
  * A configured evaluation suite ready to be run.
  */
-interface Suite {
+export interface Suite {
   /** Execute the suite and return the complete report. */
   run(): Promise<Report>;
 }

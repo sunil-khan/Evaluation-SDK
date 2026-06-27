@@ -1,4 +1,5 @@
 import { z } from "zod";
+import type { EvalError } from "./errors.js";
 
 /**
  * A single evaluation test case.
@@ -47,8 +48,8 @@ export interface ScoreResult {
   readonly reason?: string | undefined;
   /** Scorer-specific detail (e.g. the full judge prompt and response). */
   readonly raw?: unknown;
-  /** Present if the scorer failed to produce a score. Typed as Error to avoid circular deps — use instanceof for specific error types. */
-  readonly error?: Error | undefined;
+  /** Present if the scorer failed to produce a score. */
+  readonly error?: EvalError | undefined;
   /** Time taken to produce this result, in milliseconds. */
   readonly latencyMs: number;
 }

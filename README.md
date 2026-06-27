@@ -3,6 +3,7 @@
 A small, opinionated, well-typed TypeScript library for evaluating LLM outputs.
 
 [![CI](https://github.com/sunil-khan/Evaluation-SDK/actions/workflows/ci.yml/badge.svg)](https://github.com/sunil-khan/Evaluation-SDK/actions/workflows/ci.yml)
+[![npm version](https://img.shields.io/npm/v/evalkit.svg)](https://npmjs.com/package/evalkit)
 
 ---
 
@@ -391,10 +392,10 @@ Prints a summary table to stdout with pass rates and average scores per scorer. 
 ### `jsonReporter`
 
 ```ts
-jsonReporter(options?: { path?: string })(report)
+jsonReporter(filePath: string)(report)
 ```
 
-Writes the full `Report` object as JSON. If `path` is specified, writes to that file (useful for CI diffing and regression tracking). Without a path, serializes to a string.
+Writes the full `Report` object as formatted JSON to the specified file path. Auto-creates parent directories if they don't exist.
 
 ### Custom reporters
 
