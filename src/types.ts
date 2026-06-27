@@ -1,4 +1,5 @@
 import { z } from "zod";
+// biome-ignore lint/suspicious/noShadowRestrictedNames: EvalError is our custom error class, intentionally named to match the domain
 import type { EvalError } from "./errors.js";
 
 /**
