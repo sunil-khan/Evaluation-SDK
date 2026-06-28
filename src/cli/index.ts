@@ -1,0 +1,190 @@
+import * as fs from "node:fs";
+import * as path from "node:path";
+import { parseArgs } from "node:util";
+import { resolveConfig } from "./config.js";
+import { loadSuiteFile, resolveSuiteFiles } from "./loader.js";
+import { printSummary, runCommand } from "./run.js";
+
+interface ParsedArgs {
+  command: "run" | "help" | "version";
+  files: string[];
+  flags: {
+    config?: string | undefined;
+    reporter?: string | undefined;
+    verbose?: boolean | undefined;
+    threshold?: number | undefined;
+    output?: string | undefined;
+    failOnError?: boolean | undefined;
+  };
+}
+
+export function parseCliArgs(args: string[]): ParsedArgs {
+  if (args.length === 0 || args.includes("--help") || args.includes("-h")) {
+    return { command: "help", files: [], flags: {} };
+  }
+
+  if (args.includes("--version")) {
+    return { command: "version", files: [], flags: {} };
+  }
+
+  const command = args[0];
+  if (command !== "run") {
+    return { command: "help", files: [], flags: {} };
+  }
+
+  const runArgs = args.slice(1);
+
+  const { values, positionals } = parseArgs({
+    args: runArgs,
+    options: {
+      config: { type: "string", short: "c" },
+      reporter: { type: "string", short: "r" },
+      verbose: { type: "boolean", short: "v", default: false },
+      threshold: { type: "string", short: "t" },
+      output: { type: "string", short: "o" },
+      "fail-on-error": { type: "boolean", default: false },
+    },
+    allowPositionals: true,
+  });
+
+  return {
+    command: "run",
+    files: positionals,
+    flags: {
+      config: values.config,
+      reporter: values.reporter,
+      verbose: values.verbose,
+      threshold: values.threshold ? Number(values.threshold) : undefined,
+      output: values.output,
+      failOnError: values["fail-on-error"],
+    },
+  };
+}
+
+function printHelp(): void {
+  const help = `
+Usage: evalkit <command> [options]
+
+Commands:
+  run [files...]    Run evaluation suite files
+
+Options:
+  -c, --config <path>      Config file path (default: evalkit.config.ts)
+  -r, --reporter <type>    Reporter: console, json (default: console)
+  -v, --verbose            Verbose console output
+  -t, --threshold <n>      Minimum pass rate 0..1, exit 1 if below
+  -o, --output <path>      JSON output file path
+      --fail-on-error      Exit 1 on scorer errors
+  -h, --help               Show this help
+      --version            Show version
+
+Examples:
+  evalkit run ./suites/support-bot.ts
+  evalkit run "./suites/**/*.ts" --threshold 0.8
+  evalkit run --config evalkit.config.ts --reporter json
+`;
+  process.stdout.write(help.trim() + "\n");
+}
+
+function printVersion(): void {
+  const pkgPath = path.resolve(
+    path.dirname(new URL(import.meta.url).pathname),
+    "..",
+    "package.json"
+  );
+  let version = "unknown";
+  try {
+    const pkg = JSON.parse(fs.readFileSync(pkgPath, "utf-8")) as { version?: string };
+    version = pkg.version ?? "unknown";
+  } catch {
+    // Try alternative path (when running from dist/)
+    try {
+      const altPath = path.resolve(
+        path.dirname(new URL(import.meta.url).pathname),
+        "..",
+        "..",
+        "package.json"
+      );
+      const pkg = JSON.parse(fs.readFileSync(altPath, "utf-8")) as { version?: string };
+      version = pkg.version ?? "unknown";
+    } catch {
+      // Fallback to unknown
+    }
+  }
+  process.stdout.write(`evalkit v${version}\n`);
+}
+
+export async function main(argv: string[] = process.argv.slice(2)): Promise<void> {
+  const parsed = parseCliArgs(argv);
+
+  if (parsed.command === "help") {
+    printHelp();
+    process.exitCode = 0;
+    return;
+  }
+
+  if (parsed.command === "version") {
+    printVersion();
+    process.exitCode = 0;
+    return;
+  }
+
+  // Run command
+  try {
+    const config = resolveConfig({
+      cwd: process.cwd(),
+      configPath: parsed.flags.config,
+      flags: {
+        reporter: parsed.flags.reporter as "console" | "json" | undefined,
+        verbose: parsed.flags.verbose,
+        threshold: parsed.flags.threshold,
+        output: parsed.flags.output,
+        failOnError: parsed.flags.failOnError,
+      },
+    });
+
+    // Resolve files from args or config
+    const patterns = parsed.files.length > 0 ? parsed.files : config.suites;
+
+    if (patterns.length === 0) {
+      process.stderr.write(
+        "Error: No suite files specified. Provide file paths or use --config.\n"
+      );
+      process.exitCode = 3;
+      return;
+    }
+
+    const filePaths = resolveSuiteFiles(patterns);
+
+    // Load all suites
+    const allSuites: Array<{ run(): Promise<import("../types.js").Report> }> = [];
+    for (const filePath of filePaths) {
+      const suites = await loadSuiteFile(filePath);
+      allSuites.push(...suites);
+    }
+
+    if (allSuites.length === 0) {
+      process.stderr.write("Error: No suites found in the specified files.\n");
+      process.exitCode = 3;
+      return;
+    }
+
+    const exitCode = await runCommand({ suites: allSuites, config });
+
+    // Print aggregate summary for multi-suite console runs
+    if (allSuites.length > 1 && config.reporter === "console") {
+      // Individual suite summaries already printed by consoleReporter
+      // printSummary provides an optional aggregate view
+    }
+
+    process.exitCode = exitCode;
+  } catch (err) {
+    process.stderr.write(
+      `Error: ${err instanceof Error ? err.message : String(err)}\n`
+    );
+    process.exitCode = 3;
+  }
+}
+
+// Auto-run when executed directly
+main();

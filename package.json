@@ -18,6 +18,9 @@
       }
     }
   },
+  "bin": {
+    "evalkit": "./dist/cli.js"
+  },
   "files": [
     "dist"
   ],
