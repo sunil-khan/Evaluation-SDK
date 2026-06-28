@@ -431,6 +431,92 @@ defineSuite({
 
 ---
 
+## CLI
+
+Run evaluation suites from the terminal. Designed for CI pipelines.
+
+### Install
+
+```bash
+pnpm add -D @sunil-khan/evalkit
+```
+
+### Usage
+
+```bash
+# Run a suite file
+evalkit run ./suites/support-bot.ts
+
+# Multiple files
+evalkit run ./suites/tone.ts ./suites/accuracy.ts
+
+# Glob pattern
+evalkit run "./suites/**/*.ts"
+
+# With options
+evalkit run ./suite.ts --reporter json --output results.json --threshold 0.8
+
+# From config
+evalkit run --config evalkit.config.ts
+```
+
+### Suite Files
+
+Suite files export a `Suite` as the default export:
+
+```ts
+import { defineSuite, exactMatch } from '@sunil-khan/evalkit';
+
+export default defineSuite({
+  name: 'my-eval',
+  cases: [/* ... */],
+  scorers: [exactMatch()],
+});
+```
+
+### Config File
+
+Create `evalkit.config.ts` for project-level defaults:
+
+```ts
+import { defineConfig } from '@sunil-khan/evalkit/cli';
+
+export default defineConfig({
+  suites: ['./suites/**/*.ts'],
+  reporter: 'console',
+  threshold: 0.8,
+});
+```
+
+### Options
+
+| Flag | Short | Description |
+|---|---|---|
+| `--config <path>` | `-c` | Config file path |
+| `--reporter <type>` | `-r` | `console` or `json` (default: console) |
+| `--verbose` | `-v` | Show detailed output |
+| `--threshold <n>` | `-t` | Min pass rate (0..1), fail if below |
+| `--output <path>` | `-o` | JSON output file path |
+| `--fail-on-error` | | Exit 1 on scorer errors |
+
+### Exit Codes
+
+| Code | Meaning |
+|---|---|
+| 0 | All passed |
+| 1 | Failures or below threshold |
+| 2 | Scorer errors (with `--fail-on-error`) |
+| 3 | Config/file error |
+
+### CI Example
+
+```yaml
+- name: Run evaluations
+  run: npx evalkit run "./suites/**/*.ts" --threshold 0.8 --fail-on-error
+```
+
+---
+
 ## Design decisions
 
 **Why `score()` returns errors instead of throwing them**

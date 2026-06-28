@@ -55,14 +55,14 @@ describe("resolveConfig", () => {
   });
 
   it("validates threshold is between 0 and 1", () => {
-    expect(() =>
-      resolveConfig({ cwd: tmpDir, flags: { threshold: 1.5 } })
-    ).toThrow("Threshold must be a number between 0 and 1");
+    expect(() => resolveConfig({ cwd: tmpDir, flags: { threshold: 1.5 } })).toThrow(
+      "Threshold must be a number between 0 and 1",
+    );
   });
 
   it("validates reporter is console or json", () => {
-    expect(() =>
-      resolveConfig({ cwd: tmpDir, flags: { reporter: "xml" as "console" } })
-    ).toThrow('Unknown reporter "xml"');
+    expect(() => resolveConfig({ cwd: tmpDir, flags: { reporter: "xml" as "console" } })).toThrow(
+      'Unknown reporter "xml"',
+    );
   });
 });

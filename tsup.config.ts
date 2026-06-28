@@ -20,4 +20,13 @@ export default defineConfig([
     outDir: "dist",
     clean: false,
   },
+  // CLI config sub-path export
+  {
+    entry: { config: "src/cli/config.ts" },
+    format: ["esm"],
+    dts: true,
+    target: "node22",
+    outDir: "dist",
+    clean: false,
+  },
 ]);

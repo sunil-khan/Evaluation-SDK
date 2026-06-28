@@ -29,7 +29,7 @@ describe("loadSuiteFile", () => {
           summary: { total: 0, passed: 0, failed: 0, errored: 0, passRate: 0, byScorer: {}, avgLatencyMs: 0 },
         }),
       };
-      `
+      `,
     );
     const suites = await loadSuiteFile(filePath);
     expect(suites).toHaveLength(1);
@@ -45,25 +45,19 @@ describe("loadSuiteFile", () => {
   });
 
   it("throws on missing file", async () => {
-    await expect(loadSuiteFile("/nonexistent/file.ts")).rejects.toThrow(
-      "File not found"
-    );
+    await expect(loadSuiteFile("/nonexistent/file.ts")).rejects.toThrow("File not found");
   });
 
   it("throws on invalid export (no default export)", async () => {
     const filePath = path.join(tmpDir, "bad.ts");
     fs.writeFileSync(filePath, "export const foo = 42;");
-    await expect(loadSuiteFile(filePath)).rejects.toThrow(
-      "must export a Suite or Suite[]"
-    );
+    await expect(loadSuiteFile(filePath)).rejects.toThrow("must export a Suite or Suite[]");
   });
 
   it("throws on invalid export (default is not a suite)", async () => {
     const filePath = path.join(tmpDir, "not-suite.ts");
     fs.writeFileSync(filePath, "export default 42;");
-    await expect(loadSuiteFile(filePath)).rejects.toThrow(
-      "must export a Suite or Suite[]"
-    );
+    await expect(loadSuiteFile(filePath)).rejects.toThrow("must export a Suite or Suite[]");
   });
 });
 
@@ -100,8 +94,6 @@ describe("resolveSuiteFiles", () => {
   });
 
   it("throws on empty result", () => {
-    expect(() => resolveSuiteFiles([path.join(tmpDir, "*.xyz")])).toThrow(
-      "No suite files found"
-    );
+    expect(() => resolveSuiteFiles([path.join(tmpDir, "*.xyz")])).toThrow("No suite files found");
   });
 });

@@ -42,7 +42,9 @@ export function defineConfig(config: CliConfig): CliConfig {
 interface ResolveOptions {
   cwd: string;
   configPath?: string | undefined;
-  flags?: Partial<Pick<ResolvedConfig, "reporter" | "verbose" | "threshold" | "output" | "failOnError">> | undefined;
+  flags?:
+    | Partial<Pick<ResolvedConfig, "reporter" | "verbose" | "threshold" | "output" | "failOnError">>
+    | undefined;
 }
 
 const CONFIG_FILENAMES = ["evalkit.config.ts", "evalkit.config.js"];
@@ -64,7 +66,7 @@ function findConfigFile(cwd: string): string | undefined {
 export function resolveConfig(options: ResolveOptions): ResolvedConfig {
   const { cwd, configPath, flags = {} } = options;
 
-  let fileConfig: Partial<CliConfig> = {};
+  const fileConfig: Partial<CliConfig> = {};
 
   if (configPath) {
     if (!fs.existsSync(configPath)) {
@@ -88,9 +90,7 @@ export function resolveConfig(options: ResolveOptions): ResolvedConfig {
 
   const threshold = flags.threshold ?? fileConfig.threshold;
   if (threshold !== undefined && (threshold < 0 || threshold > 1)) {
-    throw new Error(
-      `Threshold must be a number between 0 and 1. Got: ${threshold}`
-    );
+    throw new Error(`Threshold must be a number between 0 and 1. Got: ${threshold}`);
   }
 
   return {

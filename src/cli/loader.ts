@@ -35,7 +35,7 @@ export async function loadSuiteFile(filePath: string): Promise<Suite[]> {
     mod = await jiti.import(resolved);
   } catch (err) {
     throw new Error(
-      `Failed to load suite file: ${filePath}\n${err instanceof Error ? err.message : String(err)}`
+      `Failed to load suite file: ${filePath}\n${err instanceof Error ? err.message : String(err)}`,
     );
   }
 
@@ -48,7 +48,7 @@ export async function loadSuiteFile(filePath: string): Promise<Suite[]> {
   if (Array.isArray(exported)) {
     if (exported.length === 0 || !exported.every(isSuite)) {
       throw new Error(
-        `Suite file must export a Suite or Suite[] as default export.\n  Got: empty array or non-Suite elements\n  File: ${filePath}`
+        `Suite file must export a Suite or Suite[] as default export.\n  Got: empty array or non-Suite elements\n  File: ${filePath}`,
       );
     }
     return exported;
@@ -59,7 +59,7 @@ export async function loadSuiteFile(filePath: string): Promise<Suite[]> {
   }
 
   throw new Error(
-    `Suite file must export a Suite or Suite[] as default export.\n  Got: ${typeof exported}\n  File: ${filePath}`
+    `Suite file must export a Suite or Suite[] as default export.\n  Got: ${typeof exported}\n  File: ${filePath}`,
   );
 }
 
@@ -110,9 +110,7 @@ export function resolveSuiteFiles(patterns: string[]): string[] {
   const result = [...files].sort();
 
   if (result.length === 0) {
-    throw new Error(
-      `No suite files found matching patterns: ${patterns.join(", ")}`
-    );
+    throw new Error(`No suite files found matching patterns: ${patterns.join(", ")}`);
   }
 
   return result;

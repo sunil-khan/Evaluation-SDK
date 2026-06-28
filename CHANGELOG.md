@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.0] - 2026-06-28
+
+### Added
+- CLI: `evalkit run` command for running suite files from the terminal.
+- Config file support (`evalkit.config.ts`) with `defineConfig` helper.
+- `--reporter`, `--threshold`, `--output`, `--verbose`, `--fail-on-error` flags.
+- Exit codes for CI integration (0/1/2/3).
+- Glob pattern support for suite file discovery.
+- TypeScript file loading via jiti (no tsx dependency required).
+
 ## [0.1.0] - 2026-06-25
 
 ### Added

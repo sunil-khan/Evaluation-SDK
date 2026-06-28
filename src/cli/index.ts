@@ -90,7 +90,7 @@ function printVersion(): void {
   const pkgPath = path.resolve(
     path.dirname(new URL(import.meta.url).pathname),
     "..",
-    "package.json"
+    "package.json",
   );
   let version = "unknown";
   try {
@@ -103,7 +103,7 @@ function printVersion(): void {
         path.dirname(new URL(import.meta.url).pathname),
         "..",
         "..",
-        "package.json"
+        "package.json",
       );
       const pkg = JSON.parse(fs.readFileSync(altPath, "utf-8")) as { version?: string };
       version = pkg.version ?? "unknown";
@@ -112,6 +112,18 @@ function printVersion(): void {
     }
   }
   process.stdout.write(`evalkit v${version}\n`);
+}
+
+function buildResolveFlags(
+  flags: ParsedArgs["flags"],
+): Parameters<typeof resolveConfig>[0]["flags"] {
+  const out: Parameters<typeof resolveConfig>[0]["flags"] = {};
+  if (flags.reporter !== undefined) out.reporter = flags.reporter as "console" | "json";
+  if (flags.verbose !== undefined) out.verbose = flags.verbose;
+  if (flags.threshold !== undefined) out.threshold = flags.threshold;
+  if (flags.output !== undefined) out.output = flags.output;
+  if (flags.failOnError !== undefined) out.failOnError = flags.failOnError;
+  return out;
 }
 
 export async function main(argv: string[] = process.argv.slice(2)): Promise<void> {
@@ -134,13 +146,7 @@ export async function main(argv: string[] = process.argv.slice(2)): Promise<void
     const config = resolveConfig({
       cwd: process.cwd(),
       configPath: parsed.flags.config,
-      flags: {
-        reporter: parsed.flags.reporter as "console" | "json" | undefined,
-        verbose: parsed.flags.verbose,
-        threshold: parsed.flags.threshold,
-        output: parsed.flags.output,
-        failOnError: parsed.flags.failOnError,
-      },
+      flags: buildResolveFlags(parsed.flags),
     });
 
     // Resolve files from args or config
@@ -148,7 +154,7 @@ export async function main(argv: string[] = process.argv.slice(2)): Promise<void
 
     if (patterns.length === 0) {
       process.stderr.write(
-        "Error: No suite files specified. Provide file paths or use --config.\n"
+        "Error: No suite files specified. Provide file paths or use --config.\n",
       );
       process.exitCode = 3;
       return;
@@ -157,7 +163,7 @@ export async function main(argv: string[] = process.argv.slice(2)): Promise<void
     const filePaths = resolveSuiteFiles(patterns);
 
     // Load all suites
-    const allSuites: Array<{ run(): Promise<import("../types.js").Report> }> = [];
+    const allSuites: Array<{ run(): Promise<unknown> }> = [];
     for (const filePath of filePaths) {
       const suites = await loadSuiteFile(filePath);
       allSuites.push(...suites);
@@ -169,7 +175,10 @@ export async function main(argv: string[] = process.argv.slice(2)): Promise<void
       return;
     }
 
-    const exitCode = await runCommand({ suites: allSuites, config });
+    const exitCode = await runCommand({
+      suites: allSuites as Array<{ run(): Promise<import("../types.js").Report> }>,
+      config,
+    });
 
     // Print aggregate summary for multi-suite console runs
     if (allSuites.length > 1 && config.reporter === "console") {
@@ -179,9 +188,7 @@ export async function main(argv: string[] = process.argv.slice(2)): Promise<void
 
     process.exitCode = exitCode;
   } catch (err) {
-    process.stderr.write(
-      `Error: ${err instanceof Error ? err.message : String(err)}\n`
-    );
+    process.stderr.write(`Error: ${err instanceof Error ? err.message : String(err)}\n`);
     process.exitCode = 3;
   }
 }

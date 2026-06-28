@@ -96,10 +96,7 @@ export async function runCommand(options: RunOptions): Promise<number> {
 /**
  * Prints a summary line for multi-suite runs.
  */
-export function printSummary(
-  reports: Report[],
-  threshold: number | undefined
-): void {
+export function printSummary(reports: Report[], threshold: number | undefined): void {
   const totalCases = reports.reduce((s, r) => s + r.summary.total, 0);
   const totalPassed = reports.reduce((s, r) => s + r.summary.passed, 0);
   const overallRate = totalCases > 0 ? totalPassed / totalCases : 0;
@@ -108,7 +105,7 @@ export function printSummary(
   lines.push("");
   lines.push("━".repeat(48));
   lines.push(
-    `Total: ${reports.length} suite${reports.length === 1 ? "" : "s"}, ${totalPassed}/${totalCases} passed (${(overallRate * 100).toFixed(1)}%)`
+    `Total: ${reports.length} suite${reports.length === 1 ? "" : "s"}, ${totalPassed}/${totalCases} passed (${(overallRate * 100).toFixed(1)}%)`,
   );
 
   if (threshold !== undefined) {
@@ -117,13 +114,9 @@ export function printSummary(
       const names = belowSuites
         .map((r) => `${r.suite} at ${(r.summary.passRate * 100).toFixed(1)}%`)
         .join(", ");
-      lines.push(
-        `Threshold: ${(threshold * 100).toFixed(0)}% — \x1b[31mFAILED\x1b[0m (${names})`
-      );
+      lines.push(`Threshold: ${(threshold * 100).toFixed(0)}% — \x1b[31mFAILED\x1b[0m (${names})`);
     } else {
-      lines.push(
-        `Threshold: ${(threshold * 100).toFixed(0)}% — \x1b[32mPASSED\x1b[0m`
-      );
+      lines.push(`Threshold: ${(threshold * 100).toFixed(0)}% — \x1b[32mPASSED\x1b[0m`);
     }
   }
 
