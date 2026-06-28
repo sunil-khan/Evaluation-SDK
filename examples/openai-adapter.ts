@@ -1,4 +1,4 @@
-import type { ChatAdapter, EmbeddingAdapter } from 'evalkit';
+import type { ChatAdapter, EmbeddingAdapter } from '@sunil-khan/evalkit';
 
 /**
  * Example OpenAI chat adapter.

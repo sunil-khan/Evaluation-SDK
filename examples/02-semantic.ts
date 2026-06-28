@@ -1,5 +1,5 @@
-import { consoleReporter, defineSuite, semanticSimilarity } from 'evalkit';
-import type { EmbeddingAdapter } from 'evalkit';
+import { consoleReporter, defineSuite, semanticSimilarity } from '@sunil-khan/evalkit';
+import type { EmbeddingAdapter } from '@sunil-khan/evalkit';
 
 // Replace with your real embedding adapter (see openai-adapter.ts)
 const mockEmbedAdapter: EmbeddingAdapter = {

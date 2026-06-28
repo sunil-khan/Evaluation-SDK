@@ -7,8 +7,8 @@
  *
  * Uses composite scorer to combine both signals with appropriate weights.
  */
-import { composite, consoleReporter, defineSuite, llmJudge, semanticSimilarity } from 'evalkit';
-import type { ChatAdapter, EmbeddingAdapter } from 'evalkit';
+import { composite, consoleReporter, defineSuite, llmJudge, semanticSimilarity } from '@sunil-khan/evalkit';
+import type { ChatAdapter, EmbeddingAdapter } from '@sunil-khan/evalkit';
 
 // Replace with your real adapters
 const mockEmbedAdapter: EmbeddingAdapter = {

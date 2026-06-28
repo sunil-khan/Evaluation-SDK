@@ -1,4 +1,4 @@
-import { consoleReporter, defineSuite, exactMatch } from 'evalkit';
+import { consoleReporter, defineSuite, exactMatch } from '@sunil-khan/evalkit';
 
 const suite = defineSuite({
   name: 'exact-match-demo',

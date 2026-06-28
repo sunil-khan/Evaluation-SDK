@@ -1,4 +1,4 @@
-import type { ChatAdapter } from 'evalkit';
+import type { ChatAdapter } from '@sunil-khan/evalkit';
 
 /**
  * Example Anthropic chat adapter.

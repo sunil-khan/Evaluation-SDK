@@ -1,5 +1,5 @@
-import { consoleReporter, defineSuite, llmJudge } from 'evalkit';
-import type { ChatAdapter } from 'evalkit';
+import { consoleReporter, defineSuite, llmJudge } from '@sunil-khan/evalkit';
+import type { ChatAdapter } from '@sunil-khan/evalkit';
 
 // Replace with your real chat adapter (see openai-adapter.ts or anthropic-adapter.ts)
 const mockChatAdapter: ChatAdapter = {

@@ -3,7 +3,7 @@
 A small, opinionated, well-typed TypeScript library for evaluating LLM outputs.
 
 [![CI](https://github.com/sunil-khan/Evaluation-SDK/actions/workflows/ci.yml/badge.svg)](https://github.com/sunil-khan/Evaluation-SDK/actions/workflows/ci.yml)
-[![npm version](https://img.shields.io/npm/v/evalkit.svg)](https://npmjs.com/package/evalkit)
+[![npm version](https://img.shields.io/npm/v/@sunil-khan/evalkit.svg)](https://npmjs.com/package/@sunil-khan/evalkit)
 [![API Docs](https://img.shields.io/badge/docs-typedoc-blue)](https://sunil-khan.github.io/Evaluation-SDK/)
 
 ---
@@ -26,9 +26,9 @@ Key principles:
 ## Install
 
 ```bash
-npm install evalkit
+npm install @sunil-khan/evalkit
 # or
-pnpm add evalkit
+pnpm add @sunil-khan/evalkit
 ```
 
 Requires Node 18+. Core logic is runtime-agnostic (works in Bun, Deno, Edge runtimes).
@@ -38,7 +38,7 @@ Requires Node 18+. Core logic is runtime-agnostic (works in Bun, Deno, Edge runt
 ## Hello world
 
 ```ts
-import { defineSuite, llmJudge, consoleReporter } from 'evalkit';
+import { defineSuite, llmJudge, consoleReporter } from '@sunil-khan/evalkit';
 import { createOpenAIChatAdapter } from './openai-adapter';
 import OpenAI from 'openai';
 
@@ -73,7 +73,7 @@ consoleReporter()(report);
 ### `exactMatch` — deterministic baseline
 
 ```ts
-import { exactMatch } from 'evalkit';
+import { exactMatch } from '@sunil-khan/evalkit';
 
 exactMatch(options?: {
   normalize?: boolean;       // trim + collapse whitespace + lowercase (default: true)
@@ -103,7 +103,7 @@ See [examples/01-exact-match.ts](./examples/01-exact-match.ts) for the full runn
 ### `semanticSimilarity` — embedding-based
 
 ```ts
-import { semanticSimilarity } from 'evalkit';
+import { semanticSimilarity } from '@sunil-khan/evalkit';
 
 semanticSimilarity(options: {
   embed: EmbeddingAdapter;   // inject your embedding provider
@@ -143,7 +143,7 @@ See [examples/02-semantic.ts](./examples/02-semantic.ts) and [examples/openai-ad
 ### `llmJudge` — LLM-as-judge
 
 ```ts
-import { llmJudge } from 'evalkit';
+import { llmJudge } from '@sunil-khan/evalkit';
 
 llmJudge(options: {
   model: ChatAdapter;          // inject your chat model
@@ -202,7 +202,7 @@ See [examples/03-llm-judge.ts](./examples/03-llm-judge.ts).
 ### `composite` — weighted multi-scorer
 
 ```ts
-import { composite } from 'evalkit';
+import { composite } from '@sunil-khan/evalkit';
 
 composite(options: {
   scorers: Scorer[];
@@ -234,7 +234,7 @@ See [examples/04-composite.ts](./examples/04-composite.ts).
 Retrieval-Augmented Generation (RAG) pipelines have two failure modes: retrieval failures (wrong or low-relevance documents) and generation failures (hallucinated or unfaithful answers). Composite scoring handles both in one pass.
 
 ```ts
-import { composite, defineSuite, llmJudge, semanticSimilarity, consoleReporter } from 'evalkit';
+import { composite, defineSuite, llmJudge, semanticSimilarity, consoleReporter } from '@sunil-khan/evalkit';
 
 const suite = defineSuite({
   name: 'rag-pipeline-factual-accuracy',

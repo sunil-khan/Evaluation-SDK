@@ -1,5 +1,5 @@
-import { composite, consoleReporter, defineSuite, exactMatch, llmJudge } from 'evalkit';
-import type { ChatAdapter } from 'evalkit';
+import { composite, consoleReporter, defineSuite, exactMatch, llmJudge } from '@sunil-khan/evalkit';
+import type { ChatAdapter } from '@sunil-khan/evalkit';
 
 const mockJudge: ChatAdapter = {
   async complete() {
