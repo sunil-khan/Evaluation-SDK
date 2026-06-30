@@ -1,6 +1,8 @@
 // Public API — exports added as modules are implemented.
 
 export { AdapterError, ConfigError, EvalError, JudgeParseError, ScorerError } from "./errors.js";
+export type { LoadOptions } from "./loaders/index.js";
+export { loadCases } from "./loaders/index.js";
 export { consoleReporter } from "./reporters/console.js";
 export { jsonReporter } from "./reporters/json.js";
 export { composite } from "./scorers/composite.js";
