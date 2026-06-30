@@ -5,6 +5,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.0] - 2026-06-30
+
+### Added
+- Dataset loader: `loadCases()` for CSV, JSONL, and JSON files.
+- Auto-format detection by file extension.
+- Extra columns/fields mapped to `metadata`.
+- Clear error messages with line numbers.
+
 ## [0.2.0] - 2026-06-28
 
 ### Added

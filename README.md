@@ -517,6 +517,51 @@ export default defineConfig({
 
 ---
 
+## Dataset Loader
+
+Load test cases from CSV, JSONL, or JSON files instead of hardcoding arrays.
+
+```ts
+import { loadCases, defineSuite, exactMatch } from '@sunil-khan/evalkit';
+
+const cases = await loadCases('./test-cases.csv');
+const suite = defineSuite({ name: 'from-file', cases, scorers: [exactMatch()] });
+```
+
+### Supported Formats
+
+**CSV** — first row is header, must contain `id`, `input`, `output`. `expected` optional. Extra columns become `metadata`.
+
+```csv
+id,input,output,expected
+refund-1,"I want a refund","I understand...","Empathetic response"
+```
+
+**JSONL** — one JSON object per line.
+
+```jsonl
+{"id":"refund-1","input":"I want a refund","output":"I understand...","expected":"Empathetic"}
+```
+
+**JSON** — array of test case objects.
+
+```json
+[{"id":"refund-1","input":"I want a refund","output":"I understand...","expected":"Empathetic"}]
+```
+
+### Options
+
+```ts
+const cases = await loadCases('./data.csv', {
+  format: 'csv',      // override auto-detection
+  delimiter: '\t',     // tab-separated
+});
+```
+
+Format is auto-detected by file extension (`.csv`, `.jsonl`, `.json`). Errors include line numbers for easy debugging.
+
+---
+
 ## Design decisions
 
 **Why `score()` returns errors instead of throwing them**

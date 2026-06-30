@@ -1,6 +1,6 @@
 {
   "name": "@sunil-khan/evalkit",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "A small, opinionated, well-typed TypeScript library for evaluating LLM outputs",
   "type": "module",
   "main": "./dist/index.cjs",
