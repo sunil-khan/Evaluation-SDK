@@ -562,6 +562,61 @@ Format is auto-detected by file extension (`.csv`, `.jsonl`, `.json`). Errors in
 
 ---
 
+## Regression Mode
+
+Compare evaluation results against a saved baseline to catch quality regressions in CI.
+
+### Save a Baseline
+
+```bash
+evalkit run ./suite.ts --output baseline.json
+```
+
+### Compare Against Baseline
+
+```bash
+evalkit run ./suite.ts --baseline baseline.json
+```
+
+If any regression is detected (pass rate drops, cases flip from pass to fail, scorer averages drop), the CLI exits with code 1.
+
+### Tolerance
+
+Allow small fluctuations without failing:
+
+```bash
+evalkit run ./suite.ts --baseline baseline.json --regression-tolerance 0.02
+```
+
+This allows up to a 2% drop in pass rate and scorer averages before flagging a regression.
+
+### Programmatic API
+
+```ts
+import { compareReports } from '@sunil-khan/evalkit';
+
+const result = compareReports(currentReport, baselineReport, { tolerance: 0.02 });
+
+if (result.regressed) {
+  console.log(result.summary);
+  console.log('Flipped cases:', result.flippedCases);
+  console.log('Scorer changes:', result.scorerChanges);
+}
+```
+
+### CI Example
+
+```yaml
+- name: Run evaluations with regression check
+  run: |
+    npx evalkit run "./suites/**/*.ts" \
+      --baseline baseline.json \
+      --regression-tolerance 0.02 \
+      --fail-on-error
+```
+
+---
+
 ## Design decisions
 
 **Why `score()` returns errors instead of throwing them**
