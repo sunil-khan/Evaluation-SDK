@@ -17,6 +17,10 @@ export interface CliConfig {
   output?: string | undefined;
   /** Fail on scorer errors. Default: false. */
   failOnError?: boolean | undefined;
+  /** Path to baseline Report JSON for regression check. */
+  baseline?: string | undefined;
+  /** Maximum allowed pass rate drop before flagging regression (0..1). Default: 0. */
+  regressionTolerance?: number | undefined;
 }
 
 /**
@@ -29,6 +33,8 @@ export interface ResolvedConfig {
   threshold: number | undefined;
   output: string | undefined;
   failOnError: boolean;
+  baseline: string | undefined;
+  regressionTolerance: number | undefined;
 }
 
 /**
@@ -43,7 +49,12 @@ interface ResolveOptions {
   cwd: string;
   configPath?: string | undefined;
   flags?:
-    | Partial<Pick<ResolvedConfig, "reporter" | "verbose" | "threshold" | "output" | "failOnError">>
+    | Partial<
+        Pick<
+          ResolvedConfig,
+          "reporter" | "verbose" | "threshold" | "output" | "failOnError" | "baseline" | "regressionTolerance"
+        >
+      >
     | undefined;
 }
 
@@ -93,6 +104,13 @@ export function resolveConfig(options: ResolveOptions): ResolvedConfig {
     throw new Error(`Threshold must be a number between 0 and 1. Got: ${threshold}`);
   }
 
+  const regressionTolerance = flags.regressionTolerance ?? fileConfig.regressionTolerance;
+  if (regressionTolerance !== undefined && (regressionTolerance < 0 || regressionTolerance > 1)) {
+    throw new Error(
+      `Regression tolerance must be between 0 and 1. Got: ${regressionTolerance}`,
+    );
+  }
+
   return {
     suites: fileConfig.suites ?? [],
     reporter,
@@ -100,5 +118,7 @@ export function resolveConfig(options: ResolveOptions): ResolvedConfig {
     threshold,
     output: flags.output ?? fileConfig.output,
     failOnError: flags.failOnError ?? fileConfig.failOnError ?? false,
+    baseline: flags.baseline ?? fileConfig.baseline,
+    regressionTolerance,
   };
 }

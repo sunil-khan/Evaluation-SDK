@@ -1,3 +1,5 @@
+import * as fs from "node:fs";
+import { compareReports, formatRegressionSummary } from "../regression.js";
 import { consoleReporter } from "../reporters/console.js";
 import { jsonReporter } from "../reporters/json.js";
 import type { Report } from "../types.js";
@@ -81,8 +83,64 @@ export async function runCommand(options: RunOptions): Promise<number> {
     await jsonReporter(config.output)(outputReport);
   }
 
+  // ── Regression check ────────────────────────────────────────────────────────
+  let regressionDetected = false;
+  if (config.baseline) {
+    const baselinePath = config.baseline;
+
+    if (!fs.existsSync(baselinePath)) {
+      throw new Error(`Baseline file not found: ${baselinePath}`);
+    }
+
+    let baselineReport: Report;
+    try {
+      const raw = fs.readFileSync(baselinePath, "utf-8");
+      baselineReport = JSON.parse(raw) as Report;
+    } catch (err) {
+      throw new Error(
+        `Baseline file is not valid Report JSON: ${err instanceof Error ? err.message : String(err)}`,
+      );
+    }
+
+    // Build aggregate report for multi-suite runs
+    const currentReport: Report =
+      reports.length === 1
+        ? reports[0]!
+        : {
+            suite: "aggregate",
+            startedAt: reports[0]?.startedAt ?? new Date().toISOString(),
+            finishedAt: reports[reports.length - 1]?.finishedAt ?? new Date().toISOString(),
+            cases: reports.flatMap((r) => [...r.cases]),
+            summary: {
+              total: reports.reduce((s, r) => s + r.summary.total, 0),
+              passed: reports.reduce((s, r) => s + r.summary.passed, 0),
+              failed: reports.reduce((s, r) => s + r.summary.failed, 0),
+              errored: reports.reduce((s, r) => s + r.summary.errored, 0),
+              passRate:
+                reports.reduce((s, r) => s + r.summary.total, 0) > 0
+                  ? reports.reduce((s, r) => s + r.summary.passed, 0) /
+                    reports.reduce((s, r) => s + r.summary.total, 0)
+                  : 0,
+              byScorer: {},
+              avgLatencyMs:
+                reports.reduce((s, r) => s + r.summary.avgLatencyMs, 0) /
+                Math.max(reports.length, 1),
+            },
+          };
+
+    const regressionResult = compareReports(currentReport, baselineReport, {
+      tolerance: config.regressionTolerance,
+    });
+
+    process.stdout.write(formatRegressionSummary(regressionResult) + "\n");
+
+    if (regressionResult.regressed) {
+      regressionDetected = true;
+    }
+  }
+
   // Determine exit code — failures take precedence
-  if (hasFailures || belowThreshold) {
+  if (hasFailures || belowThreshold || regressionDetected) {
     return 1;
   }
 

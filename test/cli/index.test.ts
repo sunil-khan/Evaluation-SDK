@@ -59,4 +59,29 @@ describe("parseCliArgs", () => {
     const result = parseCliArgs(["run", "./suite.ts", "--output", "results.json"]);
     expect(result.flags.output).toBe("results.json");
   });
+
+  it("parses --baseline flag", () => {
+    const result = parseCliArgs(["run", "./suite.ts", "--baseline", "baseline.json"]);
+    expect(result.flags.baseline).toBe("baseline.json");
+  });
+
+  it("parses --baseline short flag -b", () => {
+    const result = parseCliArgs(["run", "./suite.ts", "-b", "baseline.json"]);
+    expect(result.flags.baseline).toBe("baseline.json");
+  });
+
+  it("parses --regression-tolerance flag", () => {
+    const result = parseCliArgs(["run", "./suite.ts", "--regression-tolerance", "0.05"]);
+    expect(result.flags.regressionTolerance).toBe(0.05);
+  });
+
+  it("baseline is undefined when not provided", () => {
+    const result = parseCliArgs(["run", "./suite.ts"]);
+    expect(result.flags.baseline).toBeUndefined();
+  });
+
+  it("regressionTolerance is undefined when not provided", () => {
+    const result = parseCliArgs(["run", "./suite.ts"]);
+    expect(result.flags.regressionTolerance).toBeUndefined();
+  });
 });

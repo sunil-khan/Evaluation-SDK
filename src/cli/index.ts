@@ -15,6 +15,8 @@ interface ParsedArgs {
     threshold?: number | undefined;
     output?: string | undefined;
     failOnError?: boolean | undefined;
+    baseline?: string | undefined;
+    regressionTolerance?: number | undefined;
   };
 }
 
@@ -43,6 +45,8 @@ export function parseCliArgs(args: string[]): ParsedArgs {
       threshold: { type: "string", short: "t" },
       output: { type: "string", short: "o" },
       "fail-on-error": { type: "boolean", default: false },
+      baseline: { type: "string", short: "b" },
+      "regression-tolerance": { type: "string" },
     },
     allowPositionals: true,
   });
@@ -57,6 +61,10 @@ export function parseCliArgs(args: string[]): ParsedArgs {
       threshold: values.threshold ? Number(values.threshold) : undefined,
       output: values.output,
       failOnError: values["fail-on-error"],
+      baseline: values.baseline,
+      regressionTolerance: values["regression-tolerance"]
+        ? Number(values["regression-tolerance"])
+        : undefined,
     },
   };
 }
@@ -123,6 +131,8 @@ function buildResolveFlags(
   if (flags.threshold !== undefined) out.threshold = flags.threshold;
   if (flags.output !== undefined) out.output = flags.output;
   if (flags.failOnError !== undefined) out.failOnError = flags.failOnError;
+  if (flags.baseline !== undefined) out.baseline = flags.baseline;
+  if (flags.regressionTolerance !== undefined) out.regressionTolerance = flags.regressionTolerance;
   return out;
 }
 
