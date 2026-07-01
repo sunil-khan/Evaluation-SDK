@@ -1,5 +1,8 @@
 // Public API — exports added as modules are implemented.
 
+export { compareReports, formatRegressionSummary } from "./regression.js";
+export type { CompareOptions, RegressionResult } from "./regression.js";
+
 export { AdapterError, ConfigError, EvalError, JudgeParseError, ScorerError } from "./errors.js";
 export type { LoadOptions } from "./loaders/index.js";
 export { loadCases } from "./loaders/index.js";
